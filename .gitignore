@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+release/
+LumoData/
+lumo-data-dir.txt
+src/renderer/vendor/
+*.zip
+*.exe
+*.asar
+.DS_Store

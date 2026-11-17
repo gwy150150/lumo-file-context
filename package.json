@@ -1,0 +1,22 @@
+{
+  "name": "lumo",
+  "productName": "Lumo",
+  "version": "1.2.0",
+  "description": "简洁的多模型 AI 桌面客户端（文件上下文 + 可自定义数据目录）",
+  "main": "src/main/main.js",
+  "author": "Lumo",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "vendor": "node scripts/prepare-vendor.mjs",
+    "prepare": "node scripts/prepare-vendor.mjs"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11"
+  },
+  "dependencies": {
+    "@highlightjs/cdn-assets": "^11.10.0",
+    "dompurify": "^3.1.6",
+    "marked": "^14.1.2"
+  }
+}

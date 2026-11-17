@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' file: 'unsafe-inline'; style-src 'self' file: 'unsafe-inline'; img-src 'self' file: data: https:; font-src 'self' file: data:; connect-src 'none';" />
+<title>Lumo</title>
+<link id="hljsTheme" rel="stylesheet" href="vendor/hljs-light.css" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <!-- ============ 标题栏 ============ -->
+  <header class="titlebar">
+    <div class="tb-left">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 3.2c.9 3.4 2.4 4.9 5.8 5.8-3.4.9-4.9 2.4-5.8 5.8-.9-3.4-2.4-4.9-5.8-5.8 3.4-.9 4.9-2.4 5.8-5.8Z" fill="currentColor"/><path d="M17.6 14.4c.5 1.9 1.3 2.7 3.2 3.2-1.9.5-2.7 1.3-3.2 3.2-.5-1.9-1.3-2.7-3.2-3.2 1.9-.5 2.7-1.3 3.2-3.2Z" fill="currentColor" opacity=".55"/></svg>
+      </div>
+      <span class="brand">Lumo</span>
+    </div>
+    <div class="tb-drag"></div>
+  </header>
+
+  <div class="workspace">
+    <!-- ============ 侧栏 ============ -->
+    <aside class="sidebar">
+      <button class="new-chat" id="btnNewChat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span>新建对话</span>
+        <kbd>Ctrl N</kbd>
+      </button>
+
+      <div class="conv-scroll">
+        <div class="conv-group-label">最近</div>
+        <div id="convList" class="conv-list"></div>
+      </div>
+
+      <div class="sidebar-foot">
+        <button class="side-btn" id="btnSettings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+          <span>设置</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ============ 主区 ============ -->
+    <main class="main">
+      <div class="chat-header">
+        <div class="chat-title" id="chatTitle" title="双击重命名">新对话</div>
+        <div class="chat-actions">
+          <button class="chip" id="btnModelChip">
+            <span class="dot"></span>
+            <span id="modelChipText">未选择模型</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="messages" id="messages"></div>
+
+      <div class="drop-mask" id="dropMask" hidden>
+        <div class="drop-inner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></svg>
+          <div>松开即可添加为上下文</div>
+          <div class="drop-sub">支持 PDF / Word / Excel / PPT / 文本 / 代码</div>
+        </div>
+      </div>
+
+      <div class="composer">
+        <div class="composer-box" id="composerBox">
+          <div class="attach-list" id="attachList" hidden></div>
+          <textarea id="input" rows="1" placeholder="给 Lumo 发消息…  可拖入文件或粘贴文件作为上下文"></textarea>
+          <div class="composer-bar">
+            <div class="composer-left">
+              <button class="mini-btn attach-btn" id="btnAttach" title="添加文件作为上下文（PDF / Word / Excel / PPT / 文本 / 代码）">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 11.05 12.25 20.2a5.5 5.5 0 0 1-7.78-7.78l9.2-9.2a3.66 3.66 0 1 1 5.18 5.18l-9.2 9.2a1.83 1.83 0 0 1-2.6-2.6l8.5-8.48"/></svg>
+                <span>添加文件</span>
+              </button>
+              <button class="mini-btn" id="btnAttachInfo" title="当前会话使用的模型" hidden></button>
+            </div>
+            <div class="composer-right">
+              <button class="stop-btn" id="btnStop" hidden title="停止生成">
+                <svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+              </button>
+              <button class="send-btn" id="btnSend" title="发送 (Enter)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="composer-note" id="composerNote">Enter 发送 · Shift + Enter 换行 · 可拖入或粘贴文件</div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============ 设置抽屉 ============ -->
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden>
+  <div class="drawer-head">
+    <h2>设置</h2>
+    <button class="icon-btn" id="btnCloseDrawer" title="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <section class="sec">
+      <div class="sec-title">外观</div>
+      <div class="seg" id="themeSeg">
+        <button data-theme="light">浅色</button>
+        <button data-theme="dark">深色</button>
+        <button data-theme="system">跟随系统</button>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-title">
+        <span>模型服务</span>
+        <button class="link-btn" id="btnAddProvider">+ 添加服务</button>
+      </div>
+      <div id="providerList" class="provider-list"></div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-title">对话参数</div>
+      <div class="field">
+        <label>温度 <span class="val" id="tempVal">0.7</span></label>
+        <input type="range" id="tempRange" min="0" max="2" step="0.1" value="0.7" />
+        <div class="hint">越低越稳定，越高越有创造性</div>
+      </div>
+      <div class="field">
+        <label>最大回复长度</label>
+        <input type="number" id="maxTokens" min="0" step="256" placeholder="留空表示由服务端决定" />
+      </div>
+      <div class="field">
+        <label>系统提示词</label>
+        <textarea id="systemPrompt" rows="3" placeholder="例如：你是一位严谨的技术助手，回答简洁直接。"></textarea>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-title">数据</div>
+      <div class="row">
+        <div class="row-label">数据目录</div>
+        <div class="row-sub" id="dataPath">—</div>
+      </div>
+      <div class="data-actions">
+        <button class="ghost-btn" id="btnChangeDataDir">更改目录</button>
+        <button class="ghost-btn" id="btnOpenDataDir">打开目录</button>
+        <button class="ghost-btn" id="btnResetDataDir" hidden>恢复默认</button>
+      </div>
+      <div class="hint">可以放到任意磁盘（如 D:\Lumo），切换后立即生效，现有记录会自动复制过去</div>
+      <button class="ghost-btn danger" id="btnClearAll">清空全部对话</button>
+    </section>
+
+    <div class="drawer-foot" id="aboutLine">Lumo v1.0.0</div>
+  </div>
+</aside>
+
+<!-- ============ 模型选择弹层 ============ -->
+<div class="popover" id="modelPopover" hidden></div>
+
+<script src="vendor/marked.js"></script>
+<script src="vendor/purify.js"></script>
+<script src="vendor/highlight.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
