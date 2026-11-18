@@ -143,7 +143,12 @@ function createWindow() {
   });
 
   win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
-  win.once('ready-to-show', () => win.show());
+  // ready-to-show 万一不触发（显卡/渲染异常），3 秒后强制显示，避免“进程在但没窗口”
+  const showOnce = () => {
+    if (win && !win.isVisible()) win.show();
+  };
+  win.once('ready-to-show', showOnce);
+  setTimeout(showOnce, 3000);
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (/^https?:\/\//i.test(url)) shell.openExternal(url);
@@ -156,10 +161,14 @@ function createWindow() {
 }
 
 app.on('second-instance', () => {
-  if (win) {
-    if (win.isMinimized()) win.restore();
-    win.focus();
+  // 没有窗口就重建：否则用户再双击也不会有任何反应
+  if (!win) {
+    createWindow();
+    return;
   }
+  if (win.isMinimized()) win.restore();
+  if (!win.isVisible()) win.show();
+  win.focus();
 });
 
 app.whenReady().then(() => {
